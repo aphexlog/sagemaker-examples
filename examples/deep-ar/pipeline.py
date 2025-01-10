@@ -26,6 +26,7 @@ processor = ScriptProcessor(
     image_uri="763104351884.dkr.ecr.us-west-2.amazonaws.com/sagemaker-scikit-learn:1.2-1-cpu-py3",
     instance_count=1,
     instance_type="ml.m5.large",
+    command=["python3"],
 )
 
 processing_step = ProcessingStep(
@@ -35,6 +36,7 @@ processing_step = ProcessingStep(
         ProcessingInput(
             source=input_data_uri,
             destination="/opt/ml/processing/input/",
+            input_name="input_data",
         )
     ],
     outputs=[
@@ -53,6 +55,17 @@ estimator = Estimator(
     instance_count=1,
     instance_type="ml.m5.large",
     output_path=f"{bucket_uri}/output",
+    hyperparameters={
+        "time_freq": "H",
+        "context_length": "40",
+        "prediction_length": "20",
+        "num_cells": "40",
+        "num_layers": "2",
+        "likelihood": "gaussian",
+        "epochs": "100",
+        "mini_batch_size": "32",
+        "learning_rate": "0.001",
+    },
 )
 
 training_step = TrainingStep(
@@ -60,7 +73,7 @@ training_step = TrainingStep(
     estimator=estimator,
     inputs={
         "train": TrainingInput(
-            s3_data=processing_step.outputs[0].source
+            s3_data="s3://stock-86589a88-8765-41e7-9019-865601/processed_data",
         )
     },
 )

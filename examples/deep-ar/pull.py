@@ -20,7 +20,7 @@ def get_stock_price(stock_symbol):
 def save_stock_price(stock_symbol, training_path):
     stock = yf.Ticker(stock_symbol)
     hist = stock.history(period="5d")
-    hist.to_csv(training_path)
+    hist.to_csv(training_path, header=False)
     return hist
 
 
